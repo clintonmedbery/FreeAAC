@@ -12,6 +12,9 @@
     "@react-navigation/native": "^5.0.9",
     "@react-navigation/stack": "^5.1.1",
     "expo": "~36.0.0",
+    "expo-asset": "~8.0.0",
+    "expo-asset-utils": "^1.2.0",
+    "expo-file-system": "~8.0.0",
     "expo-font": "^8.0.0",
     "native-base": "^2.13.8",
     "react": "~16.9.0",
@@ -22,7 +25,8 @@
     "react-native-reanimated": "~1.4.0",
     "react-native-safe-area-context": "0.6.0",
     "react-native-screens": "2.0.0-alpha.12",
-    "react-native-web": "~0.11.7"
+    "react-native-web": "~0.11.7",
+    "lodash": "latest"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
