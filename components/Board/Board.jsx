@@ -2,10 +2,13 @@ import React, { useMemo, useState, useEffect } from 'react'
 import {Col, Grid, Row} from 'react-native-easy-grid';
 import {getBoard} from '../../utilities/FileUtilities';
 import _ from 'lodash'
-import {Card, CardItem, Text} from "native-base";
+import {Card, CardItem, Text, Body} from "native-base";
 import {BOARD, RUBIK_BOLD} from "../../constants/constants";
-import {Image, StyleSheet} from "react-native";
+import {Image, StyleSheet, TouchableOpacity} from "react-native";
 import communikateImage from "../../assets/communikate.png";
+import * as Speech from 'expo-speech'
+
+import {SvgUri} from "react-native-svg";
 
 const defaultBoard = {
   grid: {order: []},
@@ -14,32 +17,60 @@ const defaultBoard = {
 
 const Board = (props) => {
   const [board, setBoard] = useState(defaultBoard);
-  useEffect(async () => {
+
+  const setupBoard = async () => {
     const newBoard = await getBoard();
     setBoard(newBoard)
+  };
+
+  useEffect(() => {
+    setupBoard()
   }, []);
   console.log(board);
-  console.log("HELLsO");
 
   const buttons = useMemo(() => {
     let rows = [];
     board.grid.order.forEach((grid) => {
-      let row = grid.map((item) => {
-        let boardItem = _.find(board.buttons, {id: item})
+      let row = grid.map((item, innerIndex) => {
+        let boardItem = _.find(board.buttons, {id: item});
+        let image = _.find(board.images, {id: boardItem.image_id});
+
+        console.log("image", image);
+        console.log("boardItem", boardItem);
+
         return (
-          <Col>
-            <Card style={styles.card} borderRadius={10}>
-              <CardItem style={styles.card} borderTopLeftRadius={10} borderTopRightRadius={10}>
-                <Text style={styles.cardTitle}>{boardItem.label}</Text>
-              </CardItem>
-              {/*<CardItem button onPress={() => navigation.navigate(BOARD)} style={styles.card} borderBottomLeftRadius={10} borderBottomRightRadius={10}>*/}
-              {/*  <Image source={communikateImage} style={{height: 175, width: 400, flex: 1}}/>*/}
-              {/*</CardItem>*/}
+
+            <Card style={styles.card}>
+              <TouchableOpacity onPress={() => {
+                console.log("SPEAK");
+                Speech.speak(boardItem.label)
+              }}>
+                <CardItem style={styles.cardTitle} >
+                  <Text style={styles.cardTitle}>{boardItem.label}</Text>
+                </CardItem>
+                <CardItem style={styles.cardBody}>
+                  <Body>
+                    {image.url.endsWith('svg') ?
+                      <SvgUri
+                      width="90%"
+                      height="90%"
+                      uri={image.url}
+                    /> :
+                      <Image
+                        style={styles.image}
+                        source={{
+                          uri: image.url
+                        }}
+                      />
+                    }
+
+                  </Body>
+                </CardItem>
+              </TouchableOpacity>
             </Card>
-          </Col>
         )
       });
-      rows.push(<Row>{row}</Row>)
+      rows.push(<Row style={styles.row}>{row}</Row>)
     });
     return rows;
   }, [board]);
@@ -49,6 +80,7 @@ const Board = (props) => {
     </Grid>
   )
 };
+
 
 export default Board;
 const styles = StyleSheet.create({
@@ -63,9 +95,14 @@ const styles = StyleSheet.create({
   cardTitle: {
     color: 'white',
     fontWeight: '500',
-    fontFamily: RUBIK_BOLD
+    fontFamily: RUBIK_BOLD,
+    backgroundColor: '#3D3E41'
   },
   card: {
+    backgroundColor: '#38383B',
+    width: '20%',
+  },
+  cardBody: {
     backgroundColor: '#38383B'
   },
   background: {
@@ -73,5 +110,13 @@ const styles = StyleSheet.create({
   },
   center: {
     justifyContent: 'center'
+  },
+  image: {
+    alignSelf: 'center',
+    width: "90%", height: undefined, aspectRatio: 1.1
+  },
+  row: {
+    // margin: 10
+    marginBottom: 0
   }
 });
