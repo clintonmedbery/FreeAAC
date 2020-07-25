@@ -5,69 +5,79 @@ import _ from 'lodash'
 import {Card, CardItem, Text, Body} from "native-base";
 import {BOARD, RUBIK_BOLD} from "../../constants/constants";
 import {Image, StyleSheet, TouchableOpacity} from "react-native";
-import communikateImage from "../../assets/communikate.png";
 import * as Speech from 'expo-speech'
 
 import {SvgUri} from "react-native-svg";
 
 const defaultBoard = {
   grid: {order: []},
+};
 
-}
+const DEFAULT_BOARD_NAME = "board_1_235";
 
 const Board = (props) => {
-  const [board, setBoard] = useState(defaultBoard);
+  let [board, setBoard] = useState(defaultBoard);
+  let [boardName, setBoardName] = useState(DEFAULT_BOARD_NAME);
 
   const setupBoard = async () => {
-    const newBoard = await getBoard();
+    console.log("newBoard");
+    const newBoard = await getBoard(boardName);
     setBoard(newBoard)
   };
 
   useEffect(() => {
-    setupBoard()
-  }, []);
+    setupBoard(boardName)
+  }, [boardName]);
   console.log(board);
 
   const buttons = useMemo(() => {
     let rows = [];
     board.grid.order.forEach((grid) => {
       let row = grid.map((item, innerIndex) => {
-        let boardItem = _.find(board.buttons, {id: item});
-        let image = _.find(board.images, {id: boardItem.image_id});
+      if(!item) return
+      let boardItem = _.find(board.buttons, {id: item});
+      let image = _.find(board.images, {id: boardItem.image_id});
 
-        console.log("image", image);
-        console.log("boardItem", boardItem);
+      console.log("image", image);
+      console.log("boardItem", boardItem);
 
-        return (
+      return (
 
-            <Card style={styles.card}>
-              <TouchableOpacity onPress={() => {
-                console.log("SPEAK");
+          <Card style={styles.card}>
+            <TouchableOpacity onPress={() => {
+              console.log("SPEAK");
+              if(boardItem.load_board){
+                setBoardName(`board_${boardItem.load_board.id}`)
+              } else {
                 Speech.speak(boardItem.label)
-              }}>
-                <CardItem style={styles.cardTitle} >
-                  <Text style={styles.cardTitle}>{boardItem.label}</Text>
-                </CardItem>
-                <CardItem style={styles.cardBody}>
-                  <Body>
-                    {image.url.endsWith('svg') ?
-                      <SvgUri
-                      width="90%"
-                      height="90%"
-                      uri={image.url}
-                    /> :
-                      <Image
-                        style={styles.image}
-                        source={{
-                          uri: image.url
-                        }}
-                      />
-                    }
+                if(boardName !== DEFAULT_BOARD_NAME){
+                  setBoardName(defaultBoard)
+                }
+              }
+            }}>
+              <CardItem style={styles.cardTitle} >
+                <Text style={styles.cardTitle}>{boardItem.label}</Text>
+              </CardItem>
+              <CardItem style={styles.cardBody}>
+                <Body>
+                  {image.url.endsWith('svg') ?
+                    <SvgUri
+                    width="90%"
+                    height="90%"
+                    uri={image.url}
+                  /> :
+                    <Image
+                      style={styles.image}
+                      source={{
+                        uri: image.url
+                      }}
+                    />
+                  }
 
-                  </Body>
-                </CardItem>
-              </TouchableOpacity>
-            </Card>
+                </Body>
+              </CardItem>
+            </TouchableOpacity>
+          </Card>
         )
       });
       rows.push(<Row style={styles.row}>{row}</Row>)
