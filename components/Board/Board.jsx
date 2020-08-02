@@ -4,9 +4,8 @@ import {getBoard} from '../../utilities/FileUtilities';
 import _ from 'lodash'
 import {Card, CardItem, Text, Body} from "native-base";
 import {BOARD, RUBIK_BOLD} from "../../constants/constants";
-import {Image, StyleSheet, TouchableOpacity} from "react-native";
+import {Image, StyleSheet, TouchableOpacity, StatusBar, View, Dimensions} from "react-native";
 import * as Speech from 'expo-speech'
-
 import {SvgUri} from "react-native-svg";
 
 const defaultBoard = {
@@ -20,7 +19,6 @@ const Board = (props) => {
   let [boardName, setBoardName] = useState(DEFAULT_BOARD_NAME);
 
   const setupBoard = async () => {
-    console.log("newBoard");
     const newBoard = await getBoard(boardName);
     setBoard(newBoard)
   };
@@ -28,24 +26,23 @@ const Board = (props) => {
   useEffect(() => {
     setupBoard(boardName)
   }, [boardName]);
-  console.log(board);
 
   const buttons = useMemo(() => {
     let rows = [];
+    const cardHeight = (Dimensions.get('window').height / board.grid.rows) - 5
+    const cardWidth = (Dimensions.get('window').width / board.grid.columns) -5
+
     board.grid.order.forEach((grid) => {
       let row = grid.map((item, innerIndex) => {
       if(!item) return
       let boardItem = _.find(board.buttons, {id: item});
       let image = _.find(board.images, {id: boardItem.image_id});
-
-      console.log("image", image);
-      console.log("boardItem", boardItem);
-
+  
       return (
 
-          <Card style={styles.card}>
+          <Card style={{...styles.card, height: cardHeight, width: cardWidth}}>
             <TouchableOpacity onPress={() => {
-              console.log("SPEAK");
+
               if(boardItem.load_board){
                 setBoardName(`board_${boardItem.load_board.id}`)
               } else {
@@ -58,24 +55,27 @@ const Board = (props) => {
               <CardItem style={styles.cardTitle} >
                 <Text style={styles.cardTitle}>{boardItem.label}</Text>
               </CardItem>
-              <CardItem style={styles.cardBody}>
-                <Body>
-                  {image.url.endsWith('svg') ?
-                    <SvgUri
-                    width="90%"
-                    height="90%"
-                    uri={image.url}
-                  /> :
-                    <Image
-                      style={styles.image}
-                      source={{
-                        uri: image.url
-                      }}
-                    />
-                  }
+              {image &&
+                <CardItem style={styles.cardBody}>
+                  <Body>
+                    {image.url.endsWith('svg') ?
+                      <SvgUri
+                        style={styles.image}
+                        width="80%"
+                        height="80%"
+                        uri={image.url}
+                      /> :
+                      <Image
+                        style={styles.image}
+                        source={{
+                          uri: image.url
+                        }}
+                      />
+                    }
 
-                </Body>
-              </CardItem>
+                  </Body>
+                </CardItem>
+              }
             </TouchableOpacity>
           </Card>
         )
@@ -85,9 +85,10 @@ const Board = (props) => {
     return rows;
   }, [board]);
   return (
-    <Grid>
-      {buttons}
-    </Grid>
+      <Grid>
+        <StatusBar hidden />
+        {buttons}
+      </Grid>
   )
 };
 
@@ -109,8 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#3D3E41'
   },
   card: {
-    backgroundColor: '#38383B',
-    width: '20%',
+    backgroundColor: '#38383B'
   },
   cardBody: {
     backgroundColor: '#38383B'
@@ -123,10 +123,9 @@ const styles = StyleSheet.create({
   },
   image: {
     alignSelf: 'center',
-    width: "90%", height: undefined, aspectRatio: 1.1
+    width: "80%", height: '80%', aspectRatio: 1.1
   },
   row: {
-    // margin: 10
-    marginBottom: 0
+    marginBottom: 10
   }
 });
