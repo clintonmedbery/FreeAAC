@@ -56,6 +56,7 @@ const Board = (props) => {
         let boardItem = _.find(board.buttons, {id: item});
         let image = _.find(board.images, {id: boardItem.image_id});
 
+        
         return (
 
             <Card key={innerIndex} style={{...styles.card, height: cardHeight, width: cardWidth, maxHeight: cardHeight}}>

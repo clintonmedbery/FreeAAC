@@ -33,7 +33,26 @@
   },
   "devDependencies": {
     "@babel/core": "^7.10.5",
-    "babel-preset-expo": "~8.0.0"
+    "babel-preset-expo": "~8.0.0",
+    "husky": "^4.2.5",
+    "pretty-quick": "^2.0.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged --allow-empty"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx}": [
+      "prettier --write",
+      "./node_modules/.bin/eslint --fix",
+      "git add"
+    ],
+    "tests/**/*.{js,jsx}": [
+      "prettier --write",
+      "./node_modules/.bin/eslint --fix",
+      "git add"
+    ]
   },
   "private": true
 }
