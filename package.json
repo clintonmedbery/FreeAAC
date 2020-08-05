@@ -34,7 +34,10 @@
   "devDependencies": {
     "@babel/core": "^7.10.5",
     "babel-preset-expo": "~8.0.0",
+    "eslint": "^7.6.0",
+    "eslint-plugin-react": "^7.20.5",
     "husky": "^4.2.5",
+    "lint-staged": "^10.2.11",
     "pretty-quick": "^2.0.1"
   },
   "husky": {
@@ -43,12 +46,17 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{js,jsx}": [
+    "components/**/*.{js,jsx}": [
       "prettier --write",
       "./node_modules/.bin/eslint --fix",
       "git add"
     ],
-    "tests/**/*.{js,jsx}": [
+    "utilities/**/*.{js,jsx}": [
+      "prettier --write",
+      "./node_modules/.bin/eslint --fix",
+      "git add"
+    ],
+    "constants/**/*.{js,jsx}": [
       "prettier --write",
       "./node_modules/.bin/eslint --fix",
       "git add"
